@@ -1,0 +1,13 @@
+[Desktop Entry]
+Type=Application
+X-Nemo-Application-Type=silica-qt5
+Icon=ru.farionik.moneyspent.MoneySpentApp
+Exec=/usr/bin/ru.farionik.moneyspent.MoneySpentApp
+Name=Money Spent
+Name[ru]=Доходы и расходы
+
+[X-Application]
+Permissions=
+OrganizationName=ru.farionik.moneyspent
+ApplicationName=MoneySpentApp
+ExecDBus=/usr/bin/ru.farionik.moneyspent.MoneySpentApp
