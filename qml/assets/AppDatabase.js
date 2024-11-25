@@ -50,7 +50,7 @@ function getAllCategories(callback) {
 function getCategory(categoryId, callback) {
     var db = dbGetHandle()
     db.readTransaction(function (tx) {
-        var result = tx.executeSql("SELECT * FROM category_table WHERE id = ?", [id]);
+        var result = tx.executeSql("SELECT * FROM category_table WHERE id = ?", [categoryId]);
         callback(result.rows.item(0));
     });
 }

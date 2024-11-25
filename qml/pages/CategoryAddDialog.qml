@@ -6,7 +6,7 @@ Dialog {
     property string categoryName
 
     onAccepted: {
-        categoryName = categoryTextArea.value
+        categoryName = categoryTextArea.text
     }
 
     canAccept: categoryTextArea.text.length > 0

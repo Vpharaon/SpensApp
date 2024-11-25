@@ -18,13 +18,11 @@ Page {
                 dialog.accepted.connect(function () {
                     var categoryId = DB.insertCategory(dialog.categoryName)
                     DB.getCategory(categoryId, function(category){
-                        var noteData = {
-                            "id": note.id.toString(10),
-                            "date_text": note.date,
-                            "time_text": note.time,
-                            "note_text": note.note_text
+                        var categotyData = {
+                            "id": category.id.toString(10),
+                            "categoty_text": category.category_name,
                         }
-                        listModel.insert(0, noteData)
+                        listModel.insert(0, categotyData)
                     }
                     )
                 })
@@ -34,6 +32,22 @@ Page {
 
     SilicaListView {
         id: categoriesListView
+        quickScroll: true
+        model: ListModel { id: listModel }
+        delegate: ListItem {
+            id: listItem
+            contentHeight: Theme.itemSizeMedium
+            Label {
+                id: notesLabel
+                x: Theme.horizontalPageMargin
+                text: model.categoty_text
+            }
+        }
 
+        VerticalScrollDecorator { }
+
+        Component.onCompleted: {
+
+        }
     }
 }
