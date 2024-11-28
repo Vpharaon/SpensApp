@@ -7,8 +7,11 @@ import "../assets/AppDatabase.js" as DB
 Page {
 
     AppBar {
+        id: appBar
         headerText: "Категории"
+
         AppBarSpacer {}
+
         AppBarButton {
             context: "Доходы"
             text: "Добавить категорию"
@@ -22,6 +25,7 @@ Page {
                             "id": category.id.toString(10),
                             "categoty_text": category.category_name,
                         }
+
                         listModel.insert(0, categotyData)
                     }
                     )
@@ -30,24 +34,73 @@ Page {
         }
     }
 
-    SilicaListView {
-        id: categoriesListView
-        quickScroll: true
-        model: ListModel { id: listModel }
-        delegate: ListItem {
-            id: listItem
-            contentHeight: Theme.itemSizeMedium
-            Label {
-                id: notesLabel
-                x: Theme.horizontalPageMargin
-                text: model.categoty_text
+    SilicaFlickable {
+        anchors.fill: parent
+        anchors.topMargin: appBar.height + Theme.paddingMedium + SafeZoneRect.insets.top
+
+        SilicaListView {
+            id: categoriesListView
+            quickScroll: true
+            model: ListModel { id: listModel }
+            anchors.fill: parent
+            delegate: ListItem {
+                id: listItem
+
+                contentHeight: Theme.itemSizeMedium
+                ListView.onRemove: animateRemoval(listItem)
+
+                Behavior on opacity {
+                    FadeAnimator {}
+                }
+
+                Label {
+                    x: Theme.horizontalPageMargin
+                    anchors.verticalCenter: parent.verticalCenter
+                    truncationMode: TruncationMode.Fade
+                    font.capitalization: Font.Capitalize
+                    text: model.categoty_text
+                }
+
+                function removeCategory() {
+                    remorseDelete(function() {
+                        var categoryId = model.id
+                        listModel.remove(index)
+                        DB.deleteCategory(categoryId)
+                    }, 2000)
+                }
+
+                menu: Component {
+                    ContextMenu {
+                        MenuItem {
+                            text: "Редактировать"
+                            onClicked: {//updateNote()
+                            }
+                        }
+                        MenuItem {
+                            text: "Удалить"
+                            onClicked: removeCategory()
+                        }
+                    }
+                }
             }
-        }
 
-        VerticalScrollDecorator { }
+            VerticalScrollDecorator { }
 
-        Component.onCompleted: {
+            Component.onCompleted: {
+                DB.getAllCategories(function(rows){
+                    for (var i = 0; i < rows.length; i++) {
 
+                        var category = rows.item(i)
+
+                        var categotyData = {
+                            "id": category.id.toString(10),
+                            "categoty_text": category.category_name,
+                        }
+
+                        listModel.append(categotyData)
+                    }
+                })
+            }
         }
     }
 }
