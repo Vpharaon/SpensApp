@@ -13,20 +13,16 @@ Page {
         AppBarSpacer {}
 
         AppBarButton {
-            context: "Доходы"
+            context: "Добавить категорию"
             text: "Добавить категорию"
             icon.source: "image://theme/icon-m-add"
             onClicked: {
                 var dialog = pageStack.push(Qt.resolvedUrl("CategoryAddDialog.qml"))
                 dialog.accepted.connect(function () {
-                    var categoryId = DB.insertCategory(dialog.categoryName)
-                    DB.getCategory(categoryId, function(category){
-                        var categotyData = {
-                            "id": category.id.toString(10),
-                            "categoty_text": category.category_name,
-                        }
+                    var categoryId = DB.insertCategory(dialog.categoryName, dialog.type)
 
-                        listModel.insert(0, categotyData)
+                    DB.getCategory(categoryId, function(category){
+                        listModel.insert(0, createCategoryJson(category))
                     }
                     )
                 })
@@ -39,14 +35,17 @@ Page {
         anchors.topMargin: appBar.height + Theme.paddingMedium + SafeZoneRect.insets.top
 
         SilicaListView {
-            id: categoriesListView
+            id: listView
             quickScroll: true
-            model: ListModel { id: listModel }
+            model: ListModel {
+                id: listModel
+            }
             anchors.fill: parent
-            delegate: ListItem {
-                id: listItem
 
+            delegate: ListItem {
+                width: listView.width
                 contentHeight: Theme.itemSizeMedium
+
                 ListView.onRemove: animateRemoval(listItem)
 
                 Behavior on opacity {
@@ -69,18 +68,30 @@ Page {
                     }, 2000)
                 }
 
-                menu: Component {
-                    ContextMenu {
-                        MenuItem {
-                            text: "Редактировать"
-                            onClicked: {//updateNote()
-                            }
-                        }
-                        MenuItem {
-                            text: "Удалить"
-                            onClicked: removeCategory()
+                menu: ContextMenu {
+
+                    hasContent: id > 11 // 11 так как добавлено 11 категорий по умолчанию
+
+                    MenuItem {
+                        text: "Редактировать"
+                        onClicked: {
+
                         }
                     }
+
+                    MenuItem {
+                        text: "Удалить"
+                        onClicked: removeCategory()
+                    }
+                }
+            }
+
+            section {
+                property: "type"
+                delegate: SectionHeader {
+//                    text: if (categoty_type == 0) "Категории доходов"
+//                          else "Категории расходов"
+                    text: "categoty_type"
                 }
             }
 
@@ -89,18 +100,19 @@ Page {
             Component.onCompleted: {
                 DB.getAllCategories(function(rows){
                     for (var i = 0; i < rows.length; i++) {
-
                         var category = rows.item(i)
-
-                        var categotyData = {
-                            "id": category.id.toString(10),
-                            "categoty_text": category.category_name,
-                        }
-
-                        listModel.append(categotyData)
+                        listModel.append(createCategoryJson(category))
                     }
                 })
             }
+        }
+    }
+
+    function createCategoryJson(category) {
+        return {
+            "id": category.id.toString(10),
+            "categoty_text": category.category_name,
+            "type": category.category_type,
         }
     }
 }

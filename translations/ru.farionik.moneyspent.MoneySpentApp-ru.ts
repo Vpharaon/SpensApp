@@ -9,12 +9,4 @@
         <translation>Доходы и расходы</translation>
     </message>
 </context>
-<context>
-    <name>MainPage</name>
-    <message>
-        <location filename="../qml/pages/MainPage.qml" line="33"/>
-        <source>Money Spent</source>
-        <translation>Доходы и расходы</translation>
-    </message>
-</context>
 </TS>

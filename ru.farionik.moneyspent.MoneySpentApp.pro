@@ -12,10 +12,10 @@ HEADERS += \
 
 DISTFILES += \
     qml/assets/AppDatabase.js \
+    qml/pages/AddBudgetOperationDialog.qml \
+    qml/pages/BudgetItemsPage.qml \
     qml/pages/CategoriesPage.qml \
     qml/pages/CategoryAddDialog.qml \
-    qml/pages/ExpensesPage.qml \
-    qml/pages/IncomesPage.qml \
     rpm/ru.farionik.moneyspent.MoneySpentApp.spec \
 
 AURORAAPP_ICONS = 86x86 108x108 128x128 172x172
