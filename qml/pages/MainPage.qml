@@ -8,6 +8,8 @@ Page {
     objectName: "mainPage"
     allowedOrientations: Orientation.All
 
+    property double totalSum: 0
+
     AppBar {
         id: appBar
         headerText: "Ваш бюджет"
@@ -18,10 +20,7 @@ Page {
             context: "Добавить расход"
             icon.source: "image://theme/icon-l-remove"
             onClicked: {
-                var dialog = pageStack.push(Qt.resolvedUrl("AddBudgetOperationDialog.qml"), {
-                                                "type": 1
-                                            })
-
+                var dialog = pageStack.push(Qt.resolvedUrl("AddBudgetOperationDialog.qml"), { "type": 1 })
                 dialog.accepted.connect(function () {
                     addBudgetItemToDB(dialog)
                 })
@@ -32,11 +31,7 @@ Page {
             context: "Добавить доход"
             icon.source: "image://theme/icon-l-add"
             onClicked: {
-                var dialog = pageStack.push(Qt.resolvedUrl("AddBudgetOperationDialog.qml"), {
-                                                "type": 0
-                                            })
-
-
+                var dialog = pageStack.push(Qt.resolvedUrl("AddBudgetOperationDialog.qml"), { "type": 0 })
                 dialog.accepted.connect(function () {
                     addBudgetItemToDB(dialog)
                 })
@@ -60,9 +55,10 @@ Page {
                 PopupMenuItem {
                     text: "Посмотреть доходы"
                     onClicked: {
-                        pageStack.push(Qt.resolvedUrl("BudgetItemsPage.qml"), {
-                                           "type": 0
-                                       })
+                        var page = pageStack.push(Qt.resolvedUrl("BudgetItemsPage.qml"), { "type": 0 })
+                        page.onDone.connect(function () {
+                           getAllBudgetItems()
+                        })
                     }
                     hint: "Страница для просмотра всех доходов"
                 }
@@ -70,9 +66,10 @@ Page {
                 PopupMenuItem {
                     text: "Посмотреть расходы"
                     onClicked: {
-                        pageStack.push(Qt.resolvedUrl("BudgetItemsPage.qml"), {
-                                           "type": 1
-                                       })
+                        var page = pageStack.push(Qt.resolvedUrl("BudgetItemsPage.qml"), { "type": 1 })
+                        page.onDone.connect(function () {
+                           getAllBudgetItems()
+                        })
                     }
                     hint: "Страница для просмотра всех расходов"
                 }
@@ -162,32 +159,38 @@ Page {
 
     function getAllBudgetItems() {
         listModel.clear()
-        var totalSum = 0
+
         DB.getAllBudgetItems(function(rows){
             for (var i = 0; i < rows.length; i++) {
                 var item = rows.item(i)
-                if (item.category_type === 0) {
-                    totalSum += item.value
-                } else if (item.category_type === 1) {
-                    totalSum -= item.value
-                }
-
+                calculateTotalSumm(item)
                 listModel.append(createBudgetItemJson(item))
             }
         })
 
-        appBar.subHeaderText = totalSum.toFixed(2) + String.fromCharCode(8381)
+        setTotalSumToAppBar()
     }
 
     function addBudgetItemToDB(dialog) {
         var formatedValue = parseFloat(dialog.value.replace(",", "."))
         var itemId = DB.insertBudgetItem(dialog.categoryName, formatedValue, dialog.comment, dialog.groupId, dialog.type)
+        DB.getBudgetItem(itemId, function (item) {
+            calculateTotalSumm(item)
+            listModel.insert(0, createBudgetItemJson(item))
+        })
+        setTotalSumToAppBar()
+    }
 
-        //        DB.getBudgetItem(itemId, function(item){
-        //            listModel.insert(0, createBudgetItemJson(item))
-        //        }
-        //        )
-        getAllBudgetItems()
+    function calculateTotalSumm(item) {
+        if (item.category_type === 0) {
+            totalSum += item.value
+        } else if (item.category_type === 1) {
+            totalSum -= item.value
+        }
+    }
+
+    function setTotalSumToAppBar() {
+        appBar.subHeaderText = totalSum.toFixed(2) + String.fromCharCode(8381)
     }
 
     function createBudgetItemJson(item) {

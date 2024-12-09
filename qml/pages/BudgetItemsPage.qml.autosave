@@ -98,7 +98,6 @@ Dialog {
         var formatedValue = parseFloat(dialog.value.replace(",", "."))
         var itemId = DB.insertBudgetItem(dialog.categoryName, formatedValue, dialog.comment, dialog.groupId, dialog.type)
         DB.getBudgetItem(itemId, function (item) {
-            console.log(item.title)
             listModel.insert(0, createBudgetItemJson(item))
         })
     }

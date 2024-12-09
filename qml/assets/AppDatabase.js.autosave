@@ -52,7 +52,6 @@ function insertCategory(categoryName, type)
         var result = tx.executeSql('SELECT last_insert_rowid()')
         rowid = result.insertId
     })
-    //console.log(rowid)
     return rowid;
 }
 
@@ -72,7 +71,6 @@ function getAllCategories(callback) {
 }
 
 function getAllCategoriesByType(type, callback) {
-    console.log(type)
     var db = dbGetHandle()
     db.readTransaction(function (tx) {
         var result = tx.executeSql("SELECT * FROM category_table WHERE type = ?", [type]);

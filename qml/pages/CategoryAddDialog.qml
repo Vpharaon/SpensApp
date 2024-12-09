@@ -12,9 +12,6 @@ Dialog {
     }
 
     canAccept: categoryTextArea.text.length > 0
-    //    onAcceptBlocked: {
-
-    //    }
 
     SilicaFlickable {
         anchors.fill: parent
